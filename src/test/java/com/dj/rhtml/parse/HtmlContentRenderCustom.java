@@ -8,13 +8,15 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Undefined;
 
 import com.dj.rhtml.parse.script.HtmlScriptExecutor;
+import com.dj.rhtml.parse.script.ScriptHook;
 import com.lakeside.core.utils.StringUtils;
 import com.lakeside.download.http.HttpPage;
 import com.lakeside.download.http.HttpPageLoader;
 
-public class HtmlContentRender {
+public class HtmlContentRenderCustom {
 	
 	/**
 	 * download the http content.
@@ -29,6 +31,7 @@ public class HtmlContentRender {
 			HtmlScriptExecutor scriptExecutor = new HtmlScriptExecutor();
 			scriptExecutor.updateDocument(html,url);
 			Elements scripts = doc.select("script");
+			boolean add = false;
 			for(Element el:scripts){
 				String type = el.attr("type");
 				boolean isJavaScript = false;
@@ -37,6 +40,10 @@ public class HtmlContentRender {
 				}
 				if(isJavaScript){
 					String script = el.html();
+					if(script.startsWith("FM.view(") && !add){
+						addHook(scriptExecutor);
+						add = true;
+					}
 					scriptExecutor.evalScript(script);
 				}
 			}
@@ -45,5 +52,17 @@ public class HtmlContentRender {
 		} finally {
 			Context.exit();
 		}
+	}
+
+	private void addHook(HtmlScriptExecutor scriptExecutor) {
+		String hook="FM.view = function(obj){ if(typeof obj == 'object'){hook_apply(obj.html)}};";
+		scriptExecutor.applyHookOperation(hook, new ScriptHook(){
+			@Override
+			public void apply(Object arg) {
+				if(!Undefined.instance.equals(arg)){
+					System.out.println(arg);
+				}
+			}
+		});
 	}
 }

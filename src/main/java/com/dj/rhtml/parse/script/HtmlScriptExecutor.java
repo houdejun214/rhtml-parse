@@ -21,18 +21,23 @@ import com.dj.rhtml.utils.JSFileUtils;
 
 public class HtmlScriptExecutor implements Closeable {
 
-	private static String ENV_JS_PATH = "envjs/env.rhino.1.2.35.js";
-	
-	private final Context cx;
+	private static final int VERSION15 = Context.VERSION_1_7;
 
-	private final ScriptCache scriptCache = new ScriptCache(32);
+	private static final int OPTIMIZATION_LEVEL = -1;
+
+	private static final String ENV_JS_PATH = "envjs/env.rhino.1.2.35.js";
+	
+	private static final ScriptCache scriptCache = new ScriptCache(32);
+
+	private final Context cx;
 
 	private final Global global;
 	
+	
 	public HtmlScriptExecutor() {
 		cx = Context.enter();
-		cx.setOptimizationLevel(-1);
-		cx.setLanguageVersion(Context.VERSION_1_5);
+		cx.setOptimizationLevel(OPTIMIZATION_LEVEL);
+		cx.setLanguageVersion(VERSION15);
 		global = new Global();
 		global.init(cx);
 		this.loadJS(ENV_JS_PATH);

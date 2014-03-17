@@ -17,7 +17,17 @@ public class HtmlContentRenderTest{
 	public void testParse() throws IOException {
 		Map<String, String> header = downloadPageHeader();
 		String url="http://www.weibo.com/pickrideyejianfei";
-		HtmlContentRender render = new HtmlContentRender();
+		HtmlContentRenderCustom render = new HtmlContentRenderCustom();
+		String content = render.parse(url,header);
+		Assert.assertNotNull(content);
+		IOUtils.write(content, new FileWriter("/home/houdejun/working/temp/test.html"));
+	}
+	
+	@Test
+	public void testParse1() throws IOException {
+		Map<String, String> header = downloadPageHeader();
+		String url="http://www.weibo.com/pickrideyejianfei";
+		HtmlContentRenderCustom render = new HtmlContentRenderCustom();
 		String content = render.parse(url,header);
 		Assert.assertNotNull(content);
 		IOUtils.write(content, new FileWriter("/home/houdejun/working/temp/test.html"));
