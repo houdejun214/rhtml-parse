@@ -7,7 +7,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Undefined;
 
 import com.dj.rhtml.parse.script.HtmlScriptExecutor;
@@ -27,8 +26,8 @@ public class HtmlContentRenderCustom {
 		HttpPage page = pageLoader.download(header,url);
 		String html = page.getContentHtml();
 		Document doc = Jsoup.parse(html);
+		HtmlScriptExecutor scriptExecutor = new HtmlScriptExecutor();
 		try {
-			HtmlScriptExecutor scriptExecutor = new HtmlScriptExecutor();
 			scriptExecutor.updateDocument(html,url);
 			Elements scripts = doc.select("script");
 			boolean add = false;
@@ -50,7 +49,7 @@ public class HtmlContentRenderCustom {
 			String documentHtml = scriptExecutor.getDocumentHtml();
 			return documentHtml;
 		} finally {
-			Context.exit();
+			scriptExecutor.close();
 		}
 	}
 
