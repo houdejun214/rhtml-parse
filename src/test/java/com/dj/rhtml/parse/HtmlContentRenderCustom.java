@@ -21,6 +21,8 @@ public class HtmlContentRenderCustom {
 	 * download the http content.
 	 */
 	private static HttpPageLoader pageLoader = HttpPageLoader.getDefaultPageLoader();
+	
+	private Boolean found = false;
 
 	public String parse(String url,Map<String, String> header) throws IOException{
 		HttpPage page = pageLoader.download(header,url);
@@ -31,7 +33,11 @@ public class HtmlContentRenderCustom {
 			scriptExecutor.updateDocument(html,url);
 			Elements scripts = doc.select("script");
 			boolean add = false;
+			
 			for(Element el:scripts){
+				if(found){
+					break;
+				}
 				String type = el.attr("type");
 				boolean isJavaScript = false;
 				if(StringUtils.isEmpty(type) || "text/javascript".equals(type)){
@@ -59,7 +65,13 @@ public class HtmlContentRenderCustom {
 			@Override
 			public void apply(Object arg) {
 				if(!Undefined.instance.equals(arg)){
-					System.out.println(arg);
+					Document doc = Jsoup.parse((String) arg);
+					Elements els = doc.select(".pf_tags ul li a span");
+					if(els.size()>0){
+						System.out.println(arg);
+						System.out.println(els.text());
+						found = true;
+					}
 				}
 			}
 		});
